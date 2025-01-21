@@ -1,0 +1,4 @@
+streamlit==0.68.1
+pandas==0.25.3
+numpy==1.18.1
+scikit-learn==0.22.2.post1  # Ensure scikit-learn is installed
