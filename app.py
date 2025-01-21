@@ -1,7 +1,6 @@
 import streamlit as st
 import pickle
 import numpy as np
-from sklearn.exceptions import NotFittedError
 
 # Streamlit app
 st.title("Insurance Charges Prediction")
@@ -36,10 +35,14 @@ except Exception as e:
 # Menampilkan prediksi biaya asuransi
 if st.button("Prediksi Biaya Asuransi"):
     if loaded_model:
-        try:
-            charges_pred = loaded_model.predict(X)
-            st.success(f"Prediksi Biaya Asuransi: ${charges_pred[0]:,.2f}")
-        except Exception as e:
-            st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+        # Cek apakah model sudah dilatih
+        if hasattr(loaded_model, "coef_") or hasattr(loaded_model, "intercept_") or hasattr(loaded_model, "classes_"):
+            try:
+                charges_pred = loaded_model.predict(X)
+                st.success(f"Prediksi Biaya Asuransi: ${charges_pred[0]:,.2f}")
+            except Exception as e:
+                st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+        else:
+            st.error("Model belum dilatih (not fitted). Tidak dapat melakukan prediksi.")
     else:
         st.error("Model tidak tersedia. Tidak dapat melakukan prediksi.")
