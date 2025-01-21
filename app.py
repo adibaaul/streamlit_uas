@@ -1,9 +1,13 @@
 import streamlit as st
 import pickle
 import numpy as np
+from sklearn.exceptions import NotFittedError
 
 # Streamlit app
-st.title("Insurance Charges Prediction")
+st.title("Prediksi Biaya Asuransi")
+st.write("Nama: Aulia Adiba")  # Replace with your name
+st.write("NIM: 2021230023")    # Replace with your NIM
+
 st.write("Masukkan data Anda untuk memprediksi biaya asuransi.")
 
 # Meminta input dari pengguna
@@ -22,10 +26,25 @@ X = np.array([age, sex_encoded, bmi, children, smoker_encoded]).reshape(1, -1)
 
 # Load model yang telah disimpan
 model_path = 'model_uas.pkl'  # Pastikan model Anda berada di path yang benar
-with open(model_path, 'rb') as file:
-    loaded_model = pickle.load(file)
+try:
+    with open(model_path, 'rb') as file:
+        loaded_model = pickle.load(file)
+except FileNotFoundError:
+    st.error("Model file tidak ditemukan. Pastikan file `model_uas.pkl` ada di lokasi yang benar.")
+    loaded_model = None
+except Exception as e:
+    st.error(f"Terjadi kesalahan saat memuat model: {e}")
+    loaded_model = None
 
 # Menampilkan prediksi biaya asuransi
 if st.button("Prediksi Biaya Asuransi"):
-    charges_pred = loaded_model.predict(X)
-    st.success(f"Prediksi Biaya Asuransi: ${charges_pred[0]:,.2f}")
+    if loaded_model is not None:
+        try:
+            charges_pred = loaded_model.predict(X)
+            st.success(f"Prediksi Biaya Asuransi: ${charges_pred[0]:,.2f}")
+        except NotFittedError:
+            st.error("Model belum di-train dengan data. Pastikan model sudah di-train sebelum digunakan.")
+        except Exception as e:
+            st.error(f"Terjadi kesalahan saat melakukan prediksi: {e}")
+    else:
+        st.error("Model tidak tersedia. Tidak dapat melakukan prediksi.")
